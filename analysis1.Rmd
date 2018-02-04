@@ -8,6 +8,8 @@ output: html_document
 ```{r}
 library("ggplot2")
 library("corrplot")
+library("caret")
+library("e1071")
 ```
 
 ## Including the dataset
@@ -52,20 +54,43 @@ cor.test(train$Survived,train$Age)
 ```
 ```{r}
 num_train <- train[,sapply(train, is.numeric)]
+num_test <- test[,sapply(test, is.numeric)]
 cm <-cor(num_train)
 ```
 
 ```{r}
 corrplot(cm,method = "shade")
 ```
+Survived is correlated with Fare
+```{r}
+table(train$Survived)
+```
 
+```{r}
+qplot(Fare,data = train)
+```
+
+```{r}
+high_fare = subset(train,train$Fare > 500)
+high_fare$Survived
+```
+As predicted the people who pain high fare for the journey are survived,as per correlation
 ```{r}
 
 ```
 
-Survived is correlated with Fare
+## Naive Bayes Classifier
+
 
 ```{r}
+train1 = train
+wn_train <- within(train1,rm(Name,Ticket,Cabin))
+model <- naiveBayes(num_train$Survived~., data = num_train)
 
+```
+
+```{r}
+pred <- predict(model,num_test)
+pred
 ```
 
