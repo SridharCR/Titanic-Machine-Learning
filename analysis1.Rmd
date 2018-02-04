@@ -1,0 +1,71 @@
+---
+title: "analysis1"
+author: "Sridhar"
+date: "4 February 2018"
+output: html_document
+---
+
+```{r}
+library("ggplot2")
+library("corrplot")
+```
+
+## Including the dataset
+
+```{r}
+train <- read.csv("train.csv",stringsAsFactors = F)
+test <- read.csv("test.csv",stringsAsFactors = F)
+```
+
+## What the data has
+
+```{r}
+head(train)
+```
+```{r}
+str(train)
+```
+Variable    Name	Description
+Survived	  Survived (1) or died (0)
+Pclass	    Passenger’s class
+Name	      Passenger’s name
+Sex	        Passenger’s sex
+Age	        Passenger’s age
+SibSp	      Number of siblings/spouses aboard
+Parch	      Number of parents/children aboard
+Ticket	    Ticket number
+Fare	      Fare
+Cabin	      Cabin
+Embarked	  Port of embarkation
+
+## Clean it
+```{r}
+train <- na.omit(train)
+test <- na.omit(test)
+```
+
+
+## Age relations - Sounds insane!
+
+```{r}
+cor.test(train$Survived,train$Age)
+```
+```{r}
+num_train <- train[,sapply(train, is.numeric)]
+cm <-cor(num_train)
+```
+
+```{r}
+corrplot(cm,method = "shade")
+```
+
+```{r}
+
+```
+
+Survived is correlated with Fare
+
+```{r}
+
+```
+
