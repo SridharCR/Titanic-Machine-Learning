@@ -10,6 +10,7 @@ library("ggplot2")
 library("corrplot")
 library("caret")
 library("e1071")
+library("class")
 ```
 
 ## Including the dataset
@@ -42,8 +43,19 @@ Embarked	  Port of embarkation
 
 ## Clean it
 ```{r}
-train <- na.omit(train)
-test <- na.omit(test)
+##train <- na.omit(train)
+##test <- na.omit(test)
+```
+## Age influence
+```{r}
+table(train$Survived,train$Sex)
+```
+
+
+```{r}
+ggplot(aes(Age,as.numeric(Survived), color=Sex),data = train) + geom_point(position=position_jitter(height=0.03, width=0)) +
+  stat_smooth(method="glm", family=binomial, formula=y~x,
+alpha=0.2, size=2, aes(fill=Sex)) 
 ```
 
 
@@ -75,22 +87,18 @@ high_fare = subset(train,train$Fare > 500)
 high_fare$Survived
 ```
 As predicted the people who pain high fare for the journey are survived,as per correlation
-```{r}
 
+## Analysis
+
+Male death is higher than female
+
+```{r}
+library("ggvis")
+train %>% ggvis(~Age,~Sex,fill = ~Survived) %>% layer_points()
 ```
 
-## Naive Bayes Classifier
-
 
 ```{r}
-train1 = train
-wn_train <- within(train1,rm(Name,Ticket,Cabin))
-model <- naiveBayes(num_train$Survived~., data = num_train)
-
-```
-
-```{r}
-pred <- predict(model,num_test)
-pred
+train %<% ggvis(~Pclass)
 ```
 
