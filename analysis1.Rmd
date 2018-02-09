@@ -93,12 +93,19 @@ As predicted the people who pain high fare for the journey are survived,as per c
 Male death is higher than female
 
 ```{r}
-library("ggvis")
+
 train %>% ggvis(~Age,~Sex,fill = ~Survived) %>% layer_points()
 ```
 
 
 ```{r}
-train %<% ggvis(~Pclass)
+train %>% ggvis(~Pclass,~Survived) %>% layer_points()
+```
+
+3rd class in PClass has high survival
+
+
+```{r}
+train %>% ggvis(~Age,~Survived) %>% layer_histograms()
 ```
 
