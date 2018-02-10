@@ -11,13 +11,14 @@ library("corrplot")
 library("caret")
 library("e1071")
 library("class")
+library("rpart")
 ```
 
 ## Including the dataset
 
 ```{r}
-train <- read.csv("train.csv",stringsAsFactors = F)
-test <- read.csv("test.csv",stringsAsFactors = F)
+train <- read.csv("train.csv",stringsAsFactors = FALSE)
+test <- read.csv("test.csv",stringsAsFactors = FALSE)
 ```
 
 ## What the data has
@@ -106,6 +107,96 @@ train %>% ggvis(~Pclass,~Survived) %>% layer_points()
 
 
 ```{r}
-train %>% ggvis(~Age,~Survived) %>% layer_histograms()
+qplot(x = Pclass,data = train,,color = I('black'),fill = I('#5F009C'))
 ```
+people in 3rd class is more
+
+```{r}
+ggplot(aes(x = Sex,y = Parch),data = train) + geom_boxplot() + 
+  scale_y_log10()
+```
+Female has more parch than male
+
+## Parch ans survival
+```{r}
+cor.test(train$Survived,train$Parch)
+```
+
+```{r}
+prop.table(table(train$Survived))
+```
+
+
+```{r}
+test$Survived <- rep(0,418)
+result <- data.frame(PassengerId = test$PassengerId, Survived = test$Survived)
+write.csv(result, file = "dieall.csv", row.names = FALSE)
+```
+
+```{r}
+table(train$Sex)
+```
+```{r}
+prop.table(table(train$Sex,train$Survived),1)
+```
+So consider all females survived
+```{r}
+test$Survived <- 0
+test$Survived[test$Sex == "female"] <- 1
+result <- data.frame(PassengerId = test$PassengerId, Survived = test$Survived)
+write.csv(result, file = "diemales.csv", row.names = FALSE)
+```
+
+```{r}
+summary(train$Age)
+```
+
+```{r}
+train$Child <- 0
+train$Child[train$Age < 18] <- 1
+
+aggregate(Survived ~ Child +Sex, data = train,FUN=sum)
+```
+
+```{r}
+aggregate(Survived ~ Child + Sex, data=train, FUN=function(x) {sum(x)/length(x)})
+```
+
+```{r}
+train$Fare2 <- '30+'
+train$Fare2[train$Fare < 30 & train$Fare >= 20] <- '20-30'
+train$Fare2[train$Fare < 20 & train$Fare >= 10] <- '10-20'
+train$Fare2[train$Fare < 10] <- '<10'
+aggregate(Survived ~ Fare2 + Pclass + Sex, data=train, FUN=function(x) {sum(x)/length(x)})
+```
+
+```{r}
+test$Survived <- 0
+test$Survived[test$Sex == 'female'] <- 1
+test$Survived[test$Sex == 'female' & test$Pclass == 3 & test$Fare >= 20] <- 0
+result <- data.frame(PassengerId = test$PassengerId, Survived = test$Survived)
+write.csv(result, file = "livefemalenhighfare.csv", row.names = FALSE)
+```
+##Decision Tree
+
+```{r}
+
+fit <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked,
+               data=train,
+               method="class")
+library(rattle)
+library(rpart.plot)
+library(RColorBrewer)
+```
+
+```{r}
+fancyRpartPlot(fit)
+```
+```{r}
+Prediction <- predict(fit, test, type = "class")
+submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
+write.csv(submit, file = "myfirstdtree.csv", row.names = FALSE)
+```
+
+
 
