@@ -177,7 +177,8 @@ test$Survived[test$Sex == 'female' & test$Pclass == 3 & test$Fare >= 20] <- 0
 result <- data.frame(PassengerId = test$PassengerId, Survived = test$Survived)
 write.csv(result, file = "livefemalenhighfare.csv", row.names = FALSE)
 ```
-##Decision Tree
+
+## Decision Tree
 
 ```{r}
 
