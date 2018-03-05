@@ -12,6 +12,7 @@ library("caret")
 library("e1071")
 library("class")
 library("rpart")
+library("ggvis")
 ```
 
 ## Including the dataset
@@ -94,7 +95,6 @@ As predicted the people who pain high fare for the journey are survived,as per c
 Male death is higher than female
 
 ```{r}
-
 train %>% ggvis(~Age,~Sex,fill = ~Survived) %>% layer_points()
 ```
 
@@ -200,4 +200,27 @@ write.csv(submit, file = "myfirstdtree.csv", row.names = FALSE)
 ```
 
 
+```{r}
+
+
+fit <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked,
+               data=train,
+               method="class", 
+               control=rpart.control(minsplit=2, cp=0))
+ fancyRpartPlot(fit)
+```
+
+```{r}
+train$Name[1]
+```
+
+```{r}
+test$Survived <- NA
+combi <- rbind(train, test)
+```
+
+```{r}
+combi$Name <- as.character(combi$Name)
+combi$Name[1]
+```
 
